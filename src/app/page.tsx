@@ -47,6 +47,14 @@ export default function Home() {
         <p className="text-sm text-rose-400 mt-8">
           Powered by love • Est. 2024 • All rights reserved ❤️
         </p>
+        
+        {/* History link in footer */}
+        <Link
+          href="/history"
+          className="text-sm text-rose-300 hover:text-rose-500 transition-colors"
+        >
+          📜 View Case History
+        </Link>
       </main>
     </div>
   );
