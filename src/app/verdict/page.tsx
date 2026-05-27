@@ -39,9 +39,7 @@ function getHeatLabel(level: number): string {
 }
 
 // Simple "random" verdict based on hash of dispute description
-// In a real app, this would use actual voting/social features
 function calculateVerdict(dispute: DisputeData): "A" | "B" {
-  // Use a simple hash to determine winner (deterministic based on content)
   const combined = dispute.disputeDescription + dispute.category + dispute.theirSide;
   let hash = 0;
   for (let i = 0; i < combined.length; i++) {
@@ -57,7 +55,6 @@ export default function Verdict() {
   const [dispute, setDispute] = useState<DisputeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [verdict, setVerdict] = useState<"A" | "B" | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("loveCourt_dispute");
@@ -93,9 +90,6 @@ export default function Verdict() {
 
         // Save back to localStorage
         localStorage.setItem("loveCourt_history", JSON.stringify(history));
-
-        // Show confetti
-        setTimeout(() => setShowConfetti(true), 500);
       } catch (e) {
         console.error("Failed to parse dispute:", e);
       }
@@ -110,25 +104,28 @@ export default function Verdict() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-rose-100 via-pink-50 to-white flex items-center justify-center">
-        <div className="text-rose-500 text-lg">Deliberating...</div>
+      <div className="min-h-screen bg-[#f5f0e6] flex items-center justify-center">
+        <div className="text-[#1e3a5f] text-lg flex items-center gap-2">
+          <span className="loading-shimmer w-4 h-4 rounded-full"></span>
+          Rendering verdict...
+        </div>
       </div>
     );
   }
 
   if (!dispute) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-rose-100 via-pink-50 to-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-[#f5f0e6] flex flex-col items-center justify-center p-4">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-rose-600">No Dispute Found</h1>
-          <p className="text-rose-500">
+          <h1 className="text-2xl font-bold text-[#1e3a5f]">No Case Found</h1>
+          <p className="text-[#4a4a4a]">
             Please complete both submissions first.
           </p>
           <Link
             href="/submit-a"
-            className="inline-block px-6 py-3 bg-rose-500 text-white rounded-full font-medium hover:bg-rose-600 transition-all"
+            className="inline-block px-6 py-3 bg-[#1e3a5f] text-white rounded-sm font-medium hover:bg-[#0f2744] transition-all border-2 border-[#c9a227]"
           >
-            ← Start New Dispute
+            ← File New Case
           </Link>
         </div>
       </div>
@@ -136,89 +133,70 @@ export default function Verdict() {
   }
 
   const winnerName = verdict === "A"
-    ? (dispute.partnerAName || "Partner A")
-    : (dispute.partnerBName || "Partner B");
+    ? (dispute.partnerAName || "Petitioner")
+    : (dispute.partnerBName || "Respondent");
   const loserName = verdict === "A"
-    ? (dispute.partnerBName || "Partner B")
-    : (dispute.partnerAName || "Partner A");
+    ? (dispute.partnerBName || "Respondent")
+    : (dispute.partnerAName || "Petitioner");
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-100 via-pink-50 to-white flex flex-col items-center justify-center p-4 sm:p-8">
-      {/* Confetti effect */}
-      {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          {Array.from({ length: 50 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-              }}
-            >
-              {["💖", "💕", "❤️", "✨", "🌸"][i % 5]}
-            </div>
-          ))}
-        </div>
-      )}
-
-      <main className="w-full max-w-2xl flex flex-col items-center gap-6">
+    <div className="min-h-screen bg-[#f5f0e6] flex flex-col items-center justify-center p-4 sm:p-8">
+      <main className="w-full max-w-2xl flex flex-col items-center gap-6 animate-fade-in">
         {/* Gavel Animation */}
-        <div className="text-6xl sm:text-8xl animate-bounce">
-          ⚖️👩‍⚖️
+        <div className="text-6xl sm:text-8xl">
+          ⚖️⚖️
         </div>
 
         {/* Verdict Banner */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl sm:text-4xl font-bold text-rose-600">
-            The Verdict is In!
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1e3a5f]" style={{ fontFamily: 'Georgia, serif' }}>
+            The Courthas Rendered Its Verdict
           </h1>
-          <p className="text-rose-500">
-            After careful consideration...
+          <p className="text-[#4a4a4a]">
+            After careful deliberation of the evidence...
           </p>
         </div>
 
         {/* Winner Card */}
-        <div className="w-full bg-gradient-to-br from-rose-400 to-pink-500 rounded-3xl shadow-2xl p-8 text-center text-white">
+        <div className="w-full bg-[#1e3a5f] rounded-sm shadow-lg p-8 text-center text-white border-4 border-[#c9a227]">
           <div className="text-6xl mb-4">👑</div>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-            {winnerName} Wins!
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+            {winnerName} is Vindicated!
           </h2>
-          <p className="text-rose-100 text-lg">
-            The court has ruled in your favor.
+          <p className="text-[#e8d48a] text-lg">
+            The court rules in your favor.
           </p>
         </div>
 
         {/* Case Summary */}
-        <div className="w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 space-y-4">
-          <h3 className="text-lg font-bold text-gray-700">Case Summary</h3>
+        <div className="w-full bg-white rounded-sm shadow-md p-6 space-y-4 border-t-4 border-[#c9a227]">
+          <h3 className="text-lg font-bold text-[#1e3a5f]">Case Summary</h3>
           
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Category:</span>
-              <span className="font-medium text-gray-700">
+              <span className="text-[#8b7355]">Category:</span>
+              <span className="font-medium text-[#1a1a1a]">
                 {getCategoryLabel(dispute.category)}
               </span>
             </div>
             
             <div className="flex justify-between">
-              <span className="text-gray-500">Intensity:</span>
-              <span className="font-medium text-gray-700 flex items-center gap-2">
+              <span className="text-[#8b7355]">Intensity:</span>
+              <span className="font-medium text-[#1a1a1a] flex items-center gap-2">
                 {getHeatEmoji(dispute.intensity)} {getHeatLabel(dispute.intensity)}
               </span>
             </div>
             
-            <div className="border-t border-gray-100 pt-3">
-              <span className="text-gray-500 block mb-1">Dispute:</span>
-              <p className="text-gray-700 bg-rose-50 rounded-lg p-3 italic">
+            <div className="border-t border-[#e0e0e0] pt-3">
+              <span className="text-[#8b7355] block mb-1">Petition:</span>
+              <p className="text-[#1a1a1a] bg-[#f5f0e6] rounded-sm p-3 italic font-serif">
                 "{dispute.disputeDescription}"
               </p>
             </div>
             
-            <div className="border-t border-gray-100 pt-3">
-              <span className="text-gray-500 block mb-1">{loserName}'s Response:</span>
-              <p className="text-gray-700 bg-pink-50 rounded-lg p-3 italic">
+            <div className="border-t border-[#e0e0e0] pt-3">
+              <span className="text-[#8b7355] block mb-1">{loserName}'s Defense:</span>
+              <p className="text-[#1a1a1a] bg-[#f5f0e6] rounded-sm p-3 italic font-serif">
                 "{dispute.theirSide}"
               </p>
             </div>
@@ -229,21 +207,21 @@ export default function Verdict() {
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/history"
-            className="px-6 py-3 bg-rose-100 text-rose-700 rounded-full font-medium hover:bg-rose-200 transition-all"
+            className="px-6 py-3 bg-[#f5f0e6] text-[#1e3a5f] rounded-sm font-medium hover:bg-[#e0d8c8] transition-all"
           >
-            📜 View History
+            📜 View Records
           </Link>
           <button
             onClick={startNewCase}
-            className="px-6 py-3 bg-rose-500 text-white rounded-full font-medium hover:bg-rose-600 transition-all"
+            className="px-6 py-3 bg-[#1e3a5f] text-white rounded-sm font-medium hover:bg-[#0f2744] transition-all border-2 border-[#c9a227]"
           >
             ⚖️ New Case
           </button>
         </div>
 
         {/* Footer Note */}
-        <p className="text-xs text-gray-400 mt-4">
-          Case #{Math.floor(Math.random() * 9000) + 1000} • Love Court © 2024
+        <p className="text-xs text-[#8b7355] mt-4">
+          Case #{Math.floor(Math.random() * 9000) + 1000} • Love Court Judicial © 2024
         </p>
       </main>
     </div>

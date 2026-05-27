@@ -1,43 +1,98 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Professional Court Theme Colors */
+  --court-navy: #1e3a5f;
+  --court-navy-dark: #0f2744;
+  --court-gold: #c9a227;
+  --court-gold-light: #e8d48a;
+  --court-bronze: #8b7355;
+  --court-cream: #f5f0e6;
+  --court-black: #1a1a1a;
+  --court-gray: #4a4a4a;
+  --court-gray-light: #e0e0e0;
+  
+  --background: #f5f0e6;
+  --foreground: #1a1a1a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-court-navy: var(--court-navy);
+  --color-court-gold: var(--court-gold);
+  --color-court-cream: var(--court-cream);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1a1a;
+    --foreground: #f5f0e6;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
-/* Confetti animation for verdict page */
-@keyframes confetti {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(110vh) rotate(720deg);
-    opacity: 0;
-  }
+/* Loading shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.animate-confetti {
-  animation: confetti linear forwards;
-  font-size: 1.5rem;
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--court-gray-light) 25%,
+    var(--court-cream) 50%,
+    var(--court-gray-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Scale animation for buttons */
+@keyframes scale-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+/* Gavel pound animation */
+@keyframes gavel-pound {
+  0%, 100% { transform: rotate(-15deg); }
+  50% { transform: rotate(0deg); }
+}
+
+.animate-gavel {
+  animation: gavel-pound 0.5s ease-out;
+}
+
+/* Card subtle shadow */
+.court-card {
+  background: white;
+  border: 1px solid var(--court-gray-light);
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
+}
+
+.court-card:hover {
+  box-shadow: 0 4px 16px rgba(30, 58, 95, 0.12);
 }

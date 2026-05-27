@@ -28,6 +28,7 @@ export default function SubmitPartnerB() {
   });
   const [errors, setErrors] = useState<Partial<Record<keyof PartnerBData, string>>>({});
   const [loading, setLoading] = useState(true);
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
 
   // Load Partner A's data from localStorage on mount
   useEffect(() => {
@@ -93,12 +94,19 @@ export default function SubmitPartnerB() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoadingSubmit(true);
 
-    if (!validate()) return;
+    if (!validate()) {
+      setIsLoadingSubmit(false);
+      return;
+    }
 
     if (!partnerAData) return;
+
+    // Simulate loading
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     // Combine both submissions
     const combinedData = {
@@ -114,29 +122,33 @@ export default function SubmitPartnerB() {
 
     // Navigate to verdict page
     router.push("/verdict");
+    setIsLoadingSubmit(false);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-rose-100 via-pink-50 to-white flex items-center justify-center">
-        <div className="text-rose-500 text-lg">Loading...</div>
+      <div className="min-h-screen bg-[#f5f0e6] flex items-center justify-center">
+        <div className="text-[#1e3a5f] text-lg flex items-center gap-2">
+          <span className="loading-shimmer w-4 h-4 rounded-full"></span>
+          Loading case file...
+        </div>
       </div>
     );
   }
 
   if (!partnerAData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-rose-100 via-pink-50 to-white flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-[#f5f0e6] flex flex-col items-center justify-center p-4">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-rose-600">No Dispute Found</h1>
-          <p className="text-rose-500">
-            Partner A hasn't submitted their case yet.
+          <h1 className="text-2xl font-bold text-[#1e3a5f]">No Case Found</h1>
+          <p className="text-[#4a4a4a]">
+            No case has been filed yet.
           </p>
           <Link
             href="/submit-a"
-            className="inline-block px-6 py-3 bg-rose-500 text-white rounded-full font-medium hover:bg-rose-600 transition-all"
+            className="inline-block px-6 py-3 bg-[#1e3a5f] text-white rounded-sm font-medium hover:bg-[#0f2744] transition-all border-2 border-[#c9a227]"
           >
-            ← Start New Dispute
+            ← File New Case
           </Link>
         </div>
       </div>
@@ -144,50 +156,50 @@ export default function SubmitPartnerB() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-100 via-pink-50 to-white flex flex-col items-center justify-center p-4 sm:p-8">
+    <div className="min-h-screen bg-[#f5f0e6] flex flex-col items-center justify-center p-4 sm:p-8">
       <main className="w-full max-w-2xl flex flex-col items-center gap-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-3xl sm:text-4xl font-bold text-rose-600">
-            ⚖️ Partner B — Your Response
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1e3a5f]" style={{ fontFamily: 'Georgia, serif' }}>
+            ⚖️ Respondent — Your Reply
           </h1>
-          <p className="text-rose-500">
-            Hear the case, then tell your side
+          <p className="text-[#4a4a4a]">
+            Review the case, then present your defense
           </p>
         </div>
 
-        {/* Partner A Summary Card */}
-        <div className="w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 space-y-4">
-          <h2 className="text-lg font-bold text-gray-700 flex items-center gap-2">
-            📋 Partner A's Case
+        {/* Petitioner Summary Card */}
+        <div className="w-full bg-white rounded-sm shadow-md p-6 space-y-4 border-t-4 border-[#c9a227]">
+          <h2 className="text-lg font-bold text-[#1e3a5f] flex items-center gap-2">
+            📋 Petitioner's Case
           </h2>
           
           <div className="space-y-3">
             {partnerAData.partnerAName && (
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">Name:</span>
-                <span className="font-medium text-gray-800">{partnerAData.partnerAName}</span>
+                <span className="text-[#8b7355]">Petitioner:</span>
+                <span className="font-medium text-[#1a1a1a]">{partnerAData.partnerAName}</span>
               </div>
             )}
             
             <div className="space-y-1">
-              <span className="text-gray-500 text-sm">Their Dispute:</span>
-              <p className="text-gray-800 bg-rose-50 rounded-lg p-3 italic">
+              <span className="text-[#8b7355] text-sm">Their Dispute:</span>
+              <p className="text-[#1a1a1a] bg-[#f5f0e6] rounded-sm p-3 italic font-serif">
                 "{partnerAData.disputeDescription}"
               </p>
             </div>
             
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-gray-500">Category:</span>
-                <span className="font-medium text-gray-800">
+                <span className="text-[#8b7355]">Category:</span>
+                <span className="font-medium text-[#1a1a1a]">
                   {getCategoryLabel(partnerAData.category)}
                 </span>
               </div>
               
-              <div className="flex items-center gap-2 bg-rose-100 px-3 py-1 rounded-full">
+              <div className="flex items-center gap-2 bg-[#1e3a5f] text-white px-3 py-1 rounded-sm">
                 <span className="text-lg">{getHeatEmoji(partnerAData.intensity)}</span>
-                <span className="text-sm font-medium text-rose-700">
+                <span className="text-sm font-medium">
                   {getHeatLabel(partnerAData.intensity)}
                 </span>
               </div>
@@ -195,15 +207,15 @@ export default function SubmitPartnerB() {
           </div>
         </div>
 
-        {/* Partner B Form */}
+        {/* Respondent Form */}
         <form
           onSubmit={handleSubmit}
-          className="w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 space-y-6"
+          className="w-full bg-white rounded-sm shadow-md p-6 sm:p-8 space-y-6 border-t-4 border-[#c9a227]"
         >
-          {/* Partner B Name (Optional) */}
+          {/* Respondent Name (Optional) */}
           <div className="space-y-2">
-            <label htmlFor="partnerBName" className="block text-sm font-semibold text-gray-700">
-              Your Name <span className="text-gray-400 font-normal">(optional)</span>
+            <label htmlFor="partnerBName" className="block text-sm font-semibold text-[#1e3a5f]">
+              Your Name <span className="text-[#8b7355] font-normal">(optional)</span>
             </label>
             <input
               type="text"
@@ -212,69 +224,69 @@ export default function SubmitPartnerB() {
               value={formData.partnerBName}
               onChange={handleChange}
               placeholder="Enter your name"
-              className="w-full px-4 py-3 rounded-xl border-2 border-rose-200 focus:border-rose-500 
-                         focus:ring-2 focus:ring-rose-200 outline-none transition-all
-                         placeholder:text-gray-400"
+              className="w-full px-4 py-3 rounded-sm border-2 border-[#e0e0e0] focus:border-[#c9a227] 
+                         focus:ring-2 focus:ring-[#c9a227]/30 outline-none transition-all
+                         placeholder:text-[#8b7355] bg-white"
             />
           </div>
 
           {/* Their Side of the Story (Required) */}
           <div className="space-y-2">
-            <label htmlFor="theirSide" className="block text-sm font-semibold text-gray-700">
-              Your Side of the Story <span className="text-red-500">*</span>
+            <label htmlFor="theirSide" className="block text-sm font-semibold text-[#1e3a5f]">
+              Your Statement in Defense <span className="text-red-700">*</span>
             </label>
             <textarea
               id="theirSide"
               name="theirSide"
               value={formData.theirSide}
               onChange={handleChange}
-              placeholder="What's your perspective on this?"
+              placeholder="Present your side of the argument..."
               rows={4}
-              className={`w-full px-4 py-3 rounded-xl border-2 focus:ring-2 focus:ring-rose-200 outline-none transition-all
-                        placeholder:text-gray-400 resize-none ${
+              className={`w-full px-4 py-3 rounded-sm border-2 focus:ring-2 focus:ring-[#c9a227]/30 outline-none transition-all
+                        placeholder:text-[#8b7355] resize-none bg-white ${
                           errors.theirSide
-                            ? "border-red-400 focus:border-red-500"
-                            : "border-rose-200 focus:border-rose-500"
+                            ? "border-red-400 focus:border-red-600"
+                            : "border-[#e0e0e0] focus:border-[#c9a227]"
                         }`}
             />
             {errors.theirSide && (
-              <p className="text-red-500 text-sm">{errors.theirSide}</p>
+              <p className="text-red-700 text-sm">{errors.theirSide}</p>
             )}
           </div>
 
           {/* Agree/Disagree Toggle */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">
-              Do You Agree with Partner A? <span className="text-red-500">*</span>
+            <label className="block text-sm font-semibold text-[#1e3a5f]">
+              Do You Accept the Petition? <span className="text-red-700">*</span>
             </label>
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => handleAgreeToggle(true)}
-                className={`flex-1 px-6 py-4 rounded-xl border-2 text-lg font-medium transition-all
+                className={`flex-1 px-6 py-4 rounded-sm border-2 text-lg font-medium transition-all
                           ${
                             formData.agree === true
-                              ? "border-green-500 bg-green-100 text-green-700"
-                              : "border-rose-200 hover:border-rose-300 text-gray-600"
+                              ? "border-[#1e3a5f] bg-[#1e3a5f] text-white"
+                              : "border-[#e0e0e0] hover:border-[#c9a227] text-[#4a4a4a]"
                           }`}
               >
-                👍 Agree
+                👍 Concede
               </button>
               <button
                 type="button"
                 onClick={() => handleAgreeToggle(false)}
-                className={`flex-1 px-6 py-4 rounded-xl border-2 text-lg font-medium transition-all
+                className={`flex-1 px-6 py-4 rounded-sm border-2 text-lg font-medium transition-all
                           ${
                             formData.agree === false
-                              ? "border-red-500 bg-red-100 text-red-700"
-                              : "border-rose-200 hover:border-rose-300 text-gray-600"
+                              ? "border-[#8b7355] bg-[#8b7355] text-white"
+                              : "border-[#e0e0e0] hover:border-[#c9a227] text-[#4a4a4a]"
                           }`}
               >
-                👎 Disagree
+                👎 Contend
               </button>
             </div>
             {errors.agree && (
-              <p className="text-red-500 text-sm">{errors.agree}</p>
+              <p className="text-red-700 text-sm">{errors.agree}</p>
             )}
           </div>
 
@@ -283,26 +295,37 @@ export default function SubmitPartnerB() {
             <Link
               href="/submit-a"
               className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 
-                         text-lg font-medium text-rose-600 bg-rose-100 rounded-full
-                         hover:bg-rose-200 transition-all"
+                         text-lg font-medium text-[#1e3a5f] bg-[#f5f0e6] rounded-sm
+                         hover:bg-[#e0d8c8] transition-all"
             >
-              ← Back to Partner A
+              ← Return to Petitioner
             </Link>
             <button
               type="submit"
+              disabled={isLoadingSubmit}
               className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 
-                         text-lg font-bold text-white bg-rose-500 rounded-full shadow-lg
-                         hover:bg-rose-600 hover:scale-[1.02] active:scale-[0.98]
-                         transition-all"
+                         text-lg font-bold text-white bg-[#1e3a5f] rounded-sm shadow-md
+                         hover:bg-[#0f2744] hover:scale-[1.02] active:scale-[0.98]
+                         transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                         border-2 border-[#c9a227]"
             >
-              Submit Response →
+              {isLoadingSubmit ? (
+                <>
+                  <span className="loading-shimmer px-4 h-5 inline-block rounded-sm"></span>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  Submit Reply →
+                </>
+              )}
             </button>
           </div>
         </form>
 
         {/* Footer */}
-        <p className="text-sm text-rose-400">
-          Love Court — Where Love Gets Its Day ❤️
+        <p className="text-sm text-[#8b7355]">
+          Love Court — Where Justice Meets Love ⚖️
         </p>
       </main>
     </div>
